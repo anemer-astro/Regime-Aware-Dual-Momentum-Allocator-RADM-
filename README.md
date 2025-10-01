@@ -98,13 +98,11 @@ These results highlight:
 ---
 
 ### Cumulative Returns (Nominal vs Real)
-![Cumulative Nominal](out/equity_nominal.png)  
 ![Cumulative Real](out/equity_real.png)  
 
 ---
 
 ### 📉 Drawdowns
-![Drawdown Nominal](out/dd_nominal.png)  
 ![Drawdown Real](out/dd_real.png)  
 
 
