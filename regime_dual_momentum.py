@@ -341,6 +341,40 @@ def backtest_60_40(monthly_rets: pd.DataFrame, spy: str = "SPY", agg: str = "AGG
     return port
 # --------------------------------- Plots ------------------------------------ #
 
+def equity_curve(returns: pd.Series) -> pd.Series:
+    return (1 + returns.fillna(0)).cumprod()
+
+def drawdown_series(returns: pd.Series) -> pd.Series:
+    eq = equity_curve(returns)
+    peak = eq.cummax()
+    return eq / peak - 1.0  # negative numbers (e.g., -0.25 = -25%)
+
+def plot_drawdowns(nom_radm, nom_bench, real_radm, real_bench, outdir=None):
+    import matplotlib.pyplot as plt
+    radm_dd = drawdown_series(nom_radm)
+    bench_dd = drawdown_series(nom_bench)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    radm_dd.plot(ax=ax, label="RADM (Nominal DD)")
+    bench_dd.plot(ax=ax, label="60/40 (Nominal DD)")
+    ax.set_title("Drawdowns — Nominal")
+    ax.set_ylabel("Drawdown")
+    ax.grid(True, alpha=0.3); ax.legend(); plt.tight_layout()
+    if outdir: fig.savefig(os.path.join(outdir, "dd_nominal.png"), dpi=160)
+
+    # Real (CPI-deflated) drawdowns
+    radm_dd_real = drawdown_series(real_radm)
+    bench_dd_real = drawdown_series(real_bench)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    radm_dd_real.plot(ax=ax, label="RADM (Real DD)")
+    bench_dd_real.plot(ax=ax, label="60/40 (Real DD)")
+    ax.set_title("Drawdowns — Real (CPI-Deflated)")
+    ax.set_ylabel("Drawdown")
+    ax.grid(True, alpha=0.3); ax.legend(); plt.tight_layout()
+    if outdir: fig.savefig(os.path.join(outdir, "dd_real.png"), dpi=160)
+
+
 def plot_equity_curves(nom_radm: pd.Series, nom_bench: pd.Series,
                        real_radm: pd.Series, real_bench: pd.Series, outdir: str):
     """Plot nominal and real equity curves."""
@@ -483,6 +517,11 @@ def main():
         plot_equity_curves(out["Portfolio"], bench_6040, real_radm, real_bench, args.out_dir)
 
     # Rolling vol (nominal only) + diagnostics
+    if args.out_dir:
+        os.makedirs(args.out_dir, exist_ok=True)
+        plot_drawdowns(out["Portfolio"], bench_6040, real_radm, real_bench, outdir=args.out_dir)
+        # (keep your CSV save here)
+
     plot_rolling_vol(out["Portfolio"], bench_6040, args.out_dir)
     plot_cash_weight(out, cash_tkr, args.out_dir)
     plot_selection_ribbon(out, args.out_dir)
