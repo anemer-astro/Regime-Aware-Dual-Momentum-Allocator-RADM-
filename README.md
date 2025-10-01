@@ -1,7 +1,14 @@
-# Regime-Aware Dual Momentum Allocator (RADM)
+# Regime-Aware Dual Momentum Allocator
 
-This project explores a **regime-aware alternative to the classic 60/40 portfolio**.
+This project explores why it is **dangerous to follow a static 60/40 portfolio** without regime awareness.  
+High debt, persistent deficits, and inflationary cycles can erode real returns, even if nominal returns appear stable.  
 
+To address this, the **Regime-Aware Dual Momentum (RADM) strategy** uses:
+- **Real yield regimes** (positive vs negative) combined with **volatility signals** (VIX thresholds).  
+- **Simple momentum-based asset selection** from user-defined pools.  
+- **Equal weight allocation** with cash anchoring for stability and volatility targeting.  
+
+The goal is not complexity, but **robustness**: a framework that adapts allocations depending on whether the regime favors growth or protection.  
 ---
 
 ## Why not 60/40?
@@ -53,21 +60,7 @@ The point is not to maximize backtest Sharpe ratios, but to **demonstrate how re
 
 ---
 
-## Usage
-Example run:
-
-```bash
-python regime_dual_momentum.py \
-  --neg_pool GLD DBC VNQ AGG TIP \
-  --pos_pool SPY QUAL VLUE AGG LQD \
-  --start 2005-01-01 \
-  --top_k 2 --cost_bps 10 \
-  --vol_setpoint 0.10 \
-  --cash_floor 0.03 \
-  --vix_threshold 20
-```
-
----
+## 📈 Results
 
 ## Outputs
 - Nominal and real-return performance (CAGR, Vol, Sharpe, MaxDD).  
@@ -101,6 +94,33 @@ These results highlight:
 - **60/40 loses purchasing power** in inflationary NEG regimes.  
 - **RADM adapts** by shifting into assets like commodities, gold, or real estate when real yields are negative or volatility is high.  
 - Substantial **drawdown reduction** vs 60/40.  
+
+---
+
+### Cumulative Returns (Nominal vs Real)
+![Cumulative Nominal](out/equity_nominal.png)  
+![Cumulative Real](out/equity_real.png)  
+
+---
+
+### 📉 Drawdowns
+![Drawdown Nominal](out/dd_nominal.png)  
+![Drawdown Real](out/dd_real.png)  
+
+
+## Usage
+Example run:
+
+```bash
+python regime_dual_momentum.py \
+  --neg_pool GLD DBC VNQ AGG TIP \
+  --pos_pool SPY QUAL VLUE AGG LQD \
+  --start 2005-01-01 \
+  --top_k 2 --cost_bps 10 \
+  --vol_setpoint 0.10 \
+  --cash_floor 0.03 \
+  --vix_threshold 20
+```
 
 ---
 
